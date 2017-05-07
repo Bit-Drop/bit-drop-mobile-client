@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
 
 const ltDelt = 0.00922
 const lnDelt = 0.00421
+const BASE_URL = 'http://869b01bf.ngrok.io/'
 
 export default class BitDrop extends Component {
 
@@ -52,6 +53,36 @@ export default class BitDrop extends Component {
 
   onRegionChange(region) {
     this.setState({ ...this.state, region })
+  }
+
+  getRandomColor() {
+    const r = function() {
+      return Math.floor(Math.random() * (9 + 1))
+    }
+    return '#' + r() + r() + r() + r() + r() + r()
+  }
+
+  onLocationTap(ev) {
+    const coords = ev.nativeEvent.coordinate
+    const color = this.getRandomColor()
+    fetch(BASE_URL + 'set-tile', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        lat: coords.latitude,
+        lon: coords.longitude,
+        color: color
+      })
+    })
+    .then((response) => {
+      // alert(JSON.stringify(response))
+    })
+    .catch((error) => {
+      alert(JSON.stringify(error))
+    })
   }
 
   componentDidMount() {
@@ -102,10 +133,11 @@ export default class BitDrop extends Component {
           style={styles.map}
           region={this.state.region}
           onRegionChange={(region) => {this.onRegionChange(region)}}
+          onPress={(ev) => {this.onLocationTap(ev)}}
         >
           <MapView.UrlTile
             style={styles.tile}
-            urlTemplate='http://3ec58e69.ngrok.io/tiles/{z}/{x}/{y}.png'
+            urlTemplate={BASE_URL + 'tiles/{z}/{x}/{y}.png'}
           />
           {
             this.state.lastPosition &&
