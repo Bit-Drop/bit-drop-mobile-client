@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 
 const ltDelt = 0.00922
 const lnDelt = 0.00421
-const BASE_URL = 'http://869b01bf.ngrok.io/'
+const BASE_URL = 'http://14fd8dc6.ngrok.io/'
 
 export default class BitDrop extends Component {
 
@@ -45,7 +45,8 @@ export default class BitDrop extends Component {
         longitudeDelta: 2
       },
       initialPosition: null,
-      lastPosition: null
+      lastPosition: null,
+      cacheVersion: 1
     }
   }
 
@@ -79,6 +80,8 @@ export default class BitDrop extends Component {
     })
     .then((response) => {
       // alert(JSON.stringify(response))
+      // A hack to clear the cache of the overlay to force a fetch and a re-render
+      this.setState({ ...this.state, cacheVersion: this.state.cacheVersion + 1 })
     })
     .catch((error) => {
       alert(JSON.stringify(error))
@@ -137,7 +140,7 @@ export default class BitDrop extends Component {
         >
           <MapView.UrlTile
             style={styles.tile}
-            urlTemplate={BASE_URL + 'tiles/{z}/{x}/{y}.png'}
+            urlTemplate={BASE_URL + 'tiles/{z}/{x}/{y}.png?v=' + this.state.cacheVersion }
           />
           {
             this.state.lastPosition &&
